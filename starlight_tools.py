@@ -72,61 +72,61 @@ def read_spectrum_bz2(infile):
 ########################################################################################
 
 def make_aid(plate, mjd, fiber, DR):
-"""
- This routine makes the AID (DR7 or DR9/DR10/BOSS)
+    """
+    This routine makes the AID (DR7 or DR9/DR10/BOSS)
 
-                                     Costa-Duarte, M.V. - 10/04/2013
-"""
- if len(plate) == len(mjd) & len(plate) == len(fiber):
-  aid=[]
-  str_plate=''
-  str_mjd=''
-  str_fiberID=''
-  for i in range(len(plate)): 
-#      print 'plate, mjd, fiberID:',plate[i],mjd[i],fiber[i]
+                                       Costa-Duarte, M.V. - 10/04/2013
+    """
+    if len(plate) == len(mjd) & len(plate) == len(fiber):
+      aid=[]
+      str_plate=''
+      str_mjd=''
+      str_fiberID=''
+      for i in range(len(plate)): 
+        #      print 'plate, mjd, fiberID:',plate[i],mjd[i],fiber[i]
 
-      if DR <> 'DR7': # BOSS aid -> fiberID with 4 digits
-# Plate
-          if int(plate[i]) < 10: # 1 digit
-              str_plate = '000' + str(int(plate[i]))
-          if int(plate[i]) < 100 and plate[i] >= 10: # 2 digit
-              str_plate = '00' + str(int(plate[i]))
-          if int(plate[i]) < 1000 and plate[i] >= 100: # 3 digit
-              str_plate = '0' + str(int(plate[i]))
-          if int(plate[i]) >= 1000: # 4 digit
-             str_plate = str(int(plate[i]))
-# fiberID 
-          if int(fiber[i]) < 10: # 1 digit
-             str_fiber='000' + str(int(fiber[i]))
-          if int(fiber[i]) >= 10 and fiber[i] < 100: # 2 digits
-             str_fiber='00' + str(int(fiber[i]))
-          if int(fiber[i]) >= 100 and fiber[i] <= 999: # 3 digits
-             str_fiber='0' + str(int(fiber[i]))
-          if int(fiber[i]) == 1000: # 4 digits
-             str_fiber= str(int(fiber[i]))
-      else: # older DR -> fiberID with 3 digits
-# Plate
-          if int(plate[i]) < 10: # 1 digit
-              str_plate = '000' + str(int(plate[i]))
-          if int(plate[i]) < 100 and plate[i] >= 10: # 2 digit
-              str_plate = '00' + str(int(plate[i]))
-          if int(plate[i]) < 1000 and plate[i] >= 100: # 3 digit
-              str_plate = '0' + str(int(plate[i]))
-          if int(plate[i]) >= 1000: # 4 digit
-              str_plate = str(int(plate[i]))
-# fiberID 
-          if int(fiber[i]) < 10: # 1 digit
-              str_fiber='00' + str(int(fiber[i]))
-          if int(fiber[i]) >= 10 and int(fiber[i]) < 100: # 2 digits
-              str_fiber='0' + str(int(fiber[i]))
-          if int(fiber[i]) >= 100 and int(fiber[i]) <= 999: # 3 digits
-              str_fiber= str(int(fiber[i]))
-# MJD
-      str_mjd = str(int(mjd[i]))
-      aid.append(str_plate + '.' + str_mjd + '.' + str_fiber) 
-      #print i, plate[i], mjd[i], fiber[i], str_plate, str_mjd, str_fiber
-      #if i > 100: exit()
- return aid
+        if DR <> 'DR7': # BOSS aid -> fiberID with 4 digits
+        # Plate
+            if int(plate[i]) < 10: # 1 digit
+                str_plate = '000' + str(int(plate[i]))
+            if int(plate[i]) < 100 and plate[i] >= 10: # 2 digit
+                str_plate = '00' + str(int(plate[i]))
+            if int(plate[i]) < 1000 and plate[i] >= 100: # 3 digit
+                str_plate = '0' + str(int(plate[i]))
+            if int(plate[i]) >= 1000: # 4 digit
+               str_plate = str(int(plate[i]))
+        # fiberID 
+            if int(fiber[i]) < 10: # 1 digit
+               str_fiber='000' + str(int(fiber[i]))
+            if int(fiber[i]) >= 10 and fiber[i] < 100: # 2 digits
+               str_fiber='00' + str(int(fiber[i]))
+            if int(fiber[i]) >= 100 and fiber[i] <= 999: # 3 digits
+               str_fiber='0' + str(int(fiber[i]))
+            if int(fiber[i]) == 1000: # 4 digits
+               str_fiber= str(int(fiber[i]))
+        else: # older DR -> fiberID with 3 digits
+        # Plate
+            if int(plate[i]) < 10: # 1 digit
+                str_plate = '000' + str(int(plate[i]))
+            if int(plate[i]) < 100 and plate[i] >= 10: # 2 digit
+                str_plate = '00' + str(int(plate[i]))
+            if int(plate[i]) < 1000 and plate[i] >= 100: # 3 digit
+                str_plate = '0' + str(int(plate[i]))
+            if int(plate[i]) >= 1000: # 4 digit
+                str_plate = str(int(plate[i]))
+        # fiberID 
+            if int(fiber[i]) < 10: # 1 digit
+                str_fiber='00' + str(int(fiber[i]))
+            if int(fiber[i]) >= 10 and int(fiber[i]) < 100: # 2 digits
+                str_fiber='0' + str(int(fiber[i]))
+            if int(fiber[i]) >= 100 and int(fiber[i]) <= 999: # 3 digits
+                str_fiber= str(int(fiber[i]))
+        # MJD
+        str_mjd = str(int(mjd[i]))
+        aid.append(str_plate + '.' + str_mjd + '.' + str_fiber) 
+        #print i, plate[i], mjd[i], fiber[i], str_plate, str_mjd, str_fiber
+        #if i > 100: exit()
+    return aid
 
 ########################################################################################
 
@@ -635,28 +635,28 @@ def mask2flag(mask):
     flag=np.zeros(nl)
   #
     for i in range(0,nl):
-     flag[i]=0 # pixel OK!
-     if mask[i] >= r[9]: flag[i]=1 # EMLINE
-     if mask[i] >= r[9]+r[0] and mask[i] < r[9]+r[1]: flag[i]=2 #EMLINE + FULLREJ
-     if mask[i] >= r[9]+r[2] and mask[i] < r[9]+r[3]: flag[i]=3 #EMLINE + NOSKY
-     if mask[i] >= r[9]+r[3] and mask[i] < r[9]+r[4]: flag[i]=4 #EMLINE + SKY
-     if mask[i] >= r[9]+r[4] and mask[i] < r[9]+r[5]: flag[i]=5 #EMLINE + NODATA
-     if mask[i] >= r[9]+r[7] and mask[i] < r[9]+r[8]: flag[i]=6 #EMLINE + BADSKY
-     if mask[i] >= r[9]+r[7]+r[3] and mask[i] < r[9]+r[8]: flag[i]=7 #EMLINE + BADSKY + SKY
-     if mask[i] >= r[0] and mask[i] < r[1]: flag[i]=8 #FULLREJECT
-     if mask[i] >= r[2] and mask[i] < r[3]: flag[i]=9 # NOSKY
-     if mask[i] >= r[3] and mask[i] < r[4]: flag[i]=10 #SKY
-     if mask[i] >= r[3]+r[4] and mask[i] < r[5]: flag[i]=11 #SKY + NODATA
-     if mask[i] >= r[4] and mask[i] < r[5]: flag[i]=12 #NODATA
-     if mask[i] >= r[6] and mask[i] < r[7]: flag[i]=13 #BADFLUXFACTOR
-     if mask[i] >= r[6]+r[4] and mask[i] < r[6]+r[5]: flag[i]=14 #BADFLUX + NODATA
-     if mask[i] >= r[6]+r[3] and mask[i] < r[6]+r[4]: flag[i]=15 #BADFLUX + SKY
-     if mask[i] >= r[7] and mask[i] < r[8]: flag[i]=16  #BADSKY
-     if mask[i] >= r[7]+r[3] and mask[i] < r[7]+r[4]: flag[i]=17 #BADSKY + SKY
-     if mask[i] >= r[7]+r[3]+r[0] and mask[i] < r[7]+r[3]+r[1]: flag[i]=18 #BADSKY + SKY + FULLREJ
-     if mask[i] >= r[8] and mask[i] < r[9]: flag[i]=19 #REDMONSTER
+        flag[i]=0 # pixel OK!
+        if mask[i] >= r[9]: flag[i]=1 # EMLINE
+        if mask[i] >= r[9]+r[0] and mask[i] < r[9]+r[1]: flag[i]=2 #EMLINE + FULLREJ
+        if mask[i] >= r[9]+r[2] and mask[i] < r[9]+r[3]: flag[i]=3 #EMLINE + NOSKY
+        if mask[i] >= r[9]+r[3] and mask[i] < r[9]+r[4]: flag[i]=4 #EMLINE + SKY
+        if mask[i] >= r[9]+r[4] and mask[i] < r[9]+r[5]: flag[i]=5 #EMLINE + NODATA
+        if mask[i] >= r[9]+r[7] and mask[i] < r[9]+r[8]: flag[i]=6 #EMLINE + BADSKY
+        if mask[i] >= r[9]+r[7]+r[3] and mask[i] < r[9]+r[8]: flag[i]=7 #EMLINE + BADSKY + SKY
+        if mask[i] >= r[0] and mask[i] < r[1]: flag[i]=8 #FULLREJECT
+        if mask[i] >= r[2] and mask[i] < r[3]: flag[i]=9 # NOSKY
+        if mask[i] >= r[3] and mask[i] < r[4]: flag[i]=10 #SKY
+        if mask[i] >= r[3]+r[4] and mask[i] < r[5]: flag[i]=11 #SKY + NODATA
+        if mask[i] >= r[4] and mask[i] < r[5]: flag[i]=12 #NODATA
+        if mask[i] >= r[6] and mask[i] < r[7]: flag[i]=13 #BADFLUXFACTOR
+        if mask[i] >= r[6]+r[4] and mask[i] < r[6]+r[5]: flag[i]=14 #BADFLUX + NODATA
+        if mask[i] >= r[6]+r[3] and mask[i] < r[6]+r[4]: flag[i]=15 #BADFLUX + SKY
+        if mask[i] >= r[7] and mask[i] < r[8]: flag[i]=16  #BADSKY
+        if mask[i] >= r[7]+r[3] and mask[i] < r[7]+r[4]: flag[i]=17 #BADSKY + SKY
+        if mask[i] >= r[7]+r[3]+r[0] and mask[i] < r[7]+r[3]+r[1]: flag[i]=18 #BADSKY + SKY + FULLREJ
+        if mask[i] >= r[8] and mask[i] < r[9]: flag[i]=19 #REDMONSTER
 
-  return flag
+    return flag
 
 #########################################################################################
 
