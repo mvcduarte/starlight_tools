@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 #
-# This STARLIGHT library has several tools which can be employed to extract and 
-# analyze STARLIGHT results. 
+# This library has several tools which can be used to extract and 
+# format data from STARLIGHT results. 
 #
 #                                                Costa-Duarte, M.V. 10/04/2013
 #
@@ -12,16 +11,13 @@
 import numpy as np
 import bz2
 import matplotlib.pyplot as plt
-
 ########################################################################################
-
+#
+# This routine reads/loads a spectrum. (lambda,flux,error,flag) 
+#
+#                                     Costa-Duarte, M.V. 
+########################################################################################
 def read_spectrum(infile):
-    """
-    This routine loads spec file. (lambda,flux,error,flag) 
-
-                                       Costa-Duarte, M.V. - 10/04/2013
-    """
-
     data = [line.strip() for line in open(infile)]
     l = []
     f = []
@@ -39,15 +35,13 @@ def read_spectrum(infile):
     error = np.array(error)
     flag = np.array(flag)
     return l, f, error, flag
-
 ########################################################################################
-
+#
+# This routine reads/loads a spectrum in BZ2 extention. (lambda,flux,error,flag) 
+#
+#                                     Costa-Duarte, M.V. 
+########################################################################################
 def read_spectrum_bz2(infile):
-    """
-    This routine reads/loads a spectrum in BZ2 extention. (lambda,flux,error,flag) 
-
-                                       Costa-Duarte, M.V. - 10/04/2013
-    """
 
     bz_file = bz2.BZ2File(infile)
     data = bz_file.readlines()
@@ -68,75 +62,69 @@ def read_spectrum_bz2(infile):
     error = np.array(error)
     flag = np.array(flag)
     return l,f,error,flag
-
 ########################################################################################
-
-def make_aid(plate, mjd, fiber, DR):
-    """
-    This routine makes the AID (DR7 or DR9/DR10/BOSS)
-
-                                       Costa-Duarte, M.V. - 10/04/2013
-    """
-    if len(plate) == len(mjd) & len(plate) == len(fiber):
-      aid=[]
-      str_plate=''
-      str_mjd=''
-      str_fiberID=''
-      for i in range(len(plate)): 
-        #      print 'plate, mjd, fiberID:',plate[i],mjd[i],fiber[i]
-
-        if DR <> 'DR7': # BOSS aid -> fiberID with 4 digits
-        # Plate
-            if int(plate[i]) < 10: # 1 digit
-                str_plate = '000' + str(int(plate[i]))
-            if int(plate[i]) < 100 and plate[i] >= 10: # 2 digit
-                str_plate = '00' + str(int(plate[i]))
-            if int(plate[i]) < 1000 and plate[i] >= 100: # 3 digit
-                str_plate = '0' + str(int(plate[i]))
-            if int(plate[i]) >= 1000: # 4 digit
-               str_plate = str(int(plate[i]))
-        # fiberID 
-            if int(fiber[i]) < 10: # 1 digit
-               str_fiber='000' + str(int(fiber[i]))
-            if int(fiber[i]) >= 10 and fiber[i] < 100: # 2 digits
-               str_fiber='00' + str(int(fiber[i]))
-            if int(fiber[i]) >= 100 and fiber[i] <= 999: # 3 digits
-               str_fiber='0' + str(int(fiber[i]))
-            if int(fiber[i]) == 1000: # 4 digits
-               str_fiber= str(int(fiber[i]))
-        else: # older DR -> fiberID with 3 digits
-        # Plate
-            if int(plate[i]) < 10: # 1 digit
-                str_plate = '000' + str(int(plate[i]))
-            if int(plate[i]) < 100 and plate[i] >= 10: # 2 digit
-                str_plate = '00' + str(int(plate[i]))
-            if int(plate[i]) < 1000 and plate[i] >= 100: # 3 digit
-                str_plate = '0' + str(int(plate[i]))
-            if int(plate[i]) >= 1000: # 4 digit
-                str_plate = str(int(plate[i]))
-        # fiberID 
-            if int(fiber[i]) < 10: # 1 digit
-                str_fiber='00' + str(int(fiber[i]))
-            if int(fiber[i]) >= 10 and int(fiber[i]) < 100: # 2 digits
-                str_fiber='0' + str(int(fiber[i]))
-            if int(fiber[i]) >= 100 and int(fiber[i]) <= 999: # 3 digits
-                str_fiber= str(int(fiber[i]))
-        # MJD
-        str_mjd = str(int(mjd[i]))
-        aid.append(str_plate + '.' + str_mjd + '.' + str_fiber) 
-        #print i, plate[i], mjd[i], fiber[i], str_plate, str_mjd, str_fiber
-        #if i > 100: exit()
-    return aid
-
+#
+# This routine makes the AID (DR7 or DR9/DR10/BOSS)
+#
+#                                     Costa-Duarte, M.V.
 ########################################################################################
+def make_aid(plate,mjd,fiber,DR):
 
+ if len(plate) == len(mjd) & len(plate) == len(fiber):
+  aid=[]
+  str_plate=''
+  str_mjd=''
+  str_fiberID=''
+  for i in range(len(plate)): 
+#      print 'plate, mjd, fiberID:',plate[i],mjd[i],fiber[i]
+
+      if DR <> 'DR7': # BOSS aid -> fiberID with 4 digits
+# Plate
+          if int(plate[i]) < 10: # 1 digit
+              str_plate = '000' + str(int(plate[i]))
+          if int(plate[i]) < 100 and int(plate[i]) >= 10: # 2 digit
+              str_plate = '00' + str(int(plate[i]))
+          if int(plate[i]) < 1000 and int(plate[i]) >= 100: # 3 digit
+              str_plate = '0' + str(int(plate[i]))
+          if int(plate[i]) >= 1000: # 4 digit
+             str_plate = str(int(plate[i]))
+# fiberID 
+          if int(fiber[i]) < 10: # 1 digit
+             str_fiber='000' + str(int(fiber[i]))
+          if int(fiber[i]) >= 10 and int(fiber[i]) < 100: # 2 digits
+             str_fiber='00' + str(int(fiber[i]))
+          if int(fiber[i]) >= 100 and int(fiber[i]) <= 999: # 3 digits
+             str_fiber='0' + str(int(fiber[i]))
+          if int(fiber[i]) == 1000: # 4 digits
+             str_fiber= str(int(fiber[i]))
+      else: # older DR -> fiberID with 3 digits
+# Plate
+          if int(plate[i]) < 10: # 1 digit
+              str_plate = '000' + str(int(plate[i]))
+          if int(plate[i]) < 100 and int(plate[i]) >= 10: # 2 digit
+              str_plate = '00' + str(int(plate[i]))
+          if int(plate[i]) < 1000 and int(plate[i]) >= 100: # 3 digit
+              str_plate = '0' + str(int(plate[i]))
+          if int(plate[i]) >= 1000: # 4 digit
+              str_plate = str(int(plate[i]))
+# fiberID 
+          if int(fiber[i]) < 10: # 1 digit
+              str_fiber='00' + str(int(fiber[i]))
+          if int(fiber[i]) >= 10 and int(fiber[i]) < 100: # 2 digits
+              str_fiber='0' + str(int(fiber[i]))
+          if int(fiber[i]) >= 100 and int(fiber[i]) <= 999: # 3 digits
+              str_fiber= str(int(fiber[i]))
+# MJD
+      str_mjd = str(int(mjd[i]))
+      aid.append(str_plate + '.' + str_mjd + '.' + str_fiber) 
+ return aid
+########################################################################################
+#
+# This routine reads spectral synthesis results and calculate ages and metallicities (STARLIGHTv4).
+#
+#                                              Costa-Duarte, M.V.
+########################################################################################
 def read_synthesis(infile,dl):
-    """
-    This routine reads spectral synthesis results and calculate ages and metallicities (STARLIGHTv4).
-
-                                                Costa-Duarte, M.V. - 11/04/2013
-    """
-
 #    Read the infile
     lines = [line.strip() for line in open(infile)]
 #
@@ -192,15 +180,13 @@ def read_synthesis(infile,dl):
         chi2_red = -99999.
 
     return nel_base, SN, Mcor, Mini, AV, agemass, agelight, zmass, zlight, v0, sigma, frac_clipped, chi2_red, flag_synthesis_ok
-
 ###############################################################################################
-
+#
+# This routine reads the spectral synthesis fitting (STARLIGHTv4 format).
+#
+#                                                        Costa-Duarte, M.V.
+###############################################################################################
 def read_synthesis_spec(infile):
-    """
-    This routine reads the spectral synthesis fitting (STARLIGHTv4 format).
-
-                                                          Costa-Duarte, M.V.- 10/04/2013
-    """
 #    Read the infile
     lines = [line.strip() for line in open(infile)]
 # 
@@ -222,14 +208,13 @@ def read_synthesis_spec(infile):
         fsyn[i] = fobsnorm * float(lines[n0+1+i].split()[2])
         wei[i] = fobsnorm * float(lines[n0+1+i].split()[3])
     return l, fobs, fsyn, wei
-
 ########################################################################################
-
+#
+# Calculate the normalization factor
+#                                      Costa-Duarte, M.V.
+########################################################################################
 def norm_spec(l,f,lambda_norm_i,lambda_norm_f):
-    """
-    Calculate the normalization factor
-                                        Costa-Duarte, M.V. - 10/04/2013
-    """
+#
     l = np.array(l,dtype=np.float32)
     f = np.array(f,dtype=np.float32)
     idx_l = [(l >= lambda_norm_i) & (l <= lambda_norm_f)]
@@ -237,17 +222,12 @@ def norm_spec(l,f,lambda_norm_i,lambda_norm_f):
     return fobs_norm
 ############################################################################
 def Cardelli_RedLaw(l,R_V=3.1):
-
     '''
-
-        from W.Schoenel's routine
- 
         @summary: Calculates q(lambda) to the Cardelli, Clayton & Mathis 1989 reddening law. Converted to Python from STALIGHT.
         @param l: Wavelenght vector (Angstroms)
         @param R_V: R_V factor. Default is R_V = 3.1.
-
     '''
-
+# ###########################################################################
 #     q = A_lambda / A_V for Cardelli et al reddening law
 #     l = lambda, in Angstrons
 #     x = 1 / lambda in 1/microns
@@ -304,16 +284,14 @@ def Cardelli_RedLaw(l,R_V=3.1):
 
 def calc_redlaw(l, R_V,redlaw):
     if(redlaw == 'CCM'): return Cardelli_RedLaw(l, R_V)
-
 ########################################################################################
-
+#
+# This routine calculates the S/N ratio of a spectrum. 
+# 
+#                                           Costa-Duarte, M.V.
+########################################################################################
 def calc_SN(l,f,flag,lambda_SN_i,lambda_SN_f):
-    """
-    This routine calculates the S/N ratio of a spectrum within a wavelength range.. 
-
-                                             Costa-Duarte, M.V. - 10/04/2013
-    """
-
+#
     l = np.array(l,dtype=np.float32)
     f = np.array(f,dtype=np.float32)
     flag = np.array(flag,dtype=np.float32)
@@ -322,15 +300,14 @@ def calc_SN(l,f,flag,lambda_SN_i,lambda_SN_f):
     S = np.average(f[idx_l])
     N = np.std(f[idx_l])
     return S/N
-
 ########################################################################################
+#
+# This routine builds a spectrum from synthesis spectrum results (STARLIGHTv4)
+#
+#                                                  Costa-Duarte, M.V.
+########################################################################################
+def make_spec_from_synthesis(file_syn, path_ssp):
 
-def make_spec_from_synthesis(file_syn, path_ssp,path_base):
-    """
-    This routine builds the spectrum from synthesis spectrum results (STARLIGHTv4)
-
-                                                    Costa-Duarte, M.V. - 01/05/2013
-    """
     #   Read the infile
 
     lines = [line.strip() for line in open(file_syn)]
@@ -355,7 +332,7 @@ def make_spec_from_synthesis(file_syn, path_ssp,path_base):
 
     #   Reading the spectral base 
 
-    lines = [line.strip() for line in open(path_base+file_base)]
+    lines = [line.strip() for line in open(path_ssp + file_base)]
     file_ssp = []
     for i in range(int(lines[0].split()[0])+1):
         if i > 0: # 1st line - number of SSPs
@@ -395,82 +372,64 @@ def make_spec_from_synthesis(file_syn, path_ssp,path_base):
     f_syn = (f_syn / fobsnorm0) * fobsnorm
 
     return l_syn, f_syn
-
 #########################################################################################
-
+#
+# This routines interpolates the spectrum with new resolution (dl) and
+# keeping the flags and errors. 
+#                                            Costa-Duarte, M.V.
+########################################################################################
 def interpol_spec(l0,f0,error0,flag0,li,lf,dl):
-    """
-    This routines interpolates the spectrum with new resolution (dl) and
-    keeping the flags and errors. 
-                                              Costa-Duarte, M.V. - 03/05/2013
-    """
     # Resampling  of Flux and Error_flux
-
     l = np.arange(li,lf,dl) # New lambda-vector
     f = np.interp(l, l0, f0, left = 0.0, right = 0.0)
     error = np.interp(l, l0, error0, left = 0.0, right = 0.0)
-
     # Resampling  of Flag
-
     flag = np.zeros(len(l)) # Resampling -> flag
     for j in range(len(l)):
         idx = (np.abs(l0-l[j])).argmin()
         flag[j] = flag0[idx]
-
     flag[f == 0.] = 99  # Flux = 0. are flagged as 99 (not considered in synthesis!)    
-
     return l,f,error,flag
-
 #########################################################################################
-
+#
+# This routines generates a population vector (light or mass vector) in order to 
+# simulate a galaxy spectrum. 
+#                                            Costa-Duarte, M.V.
+########################################################################################
 def generate_popvec(x):
-    """
-
-    This routines generates a population vector (light or mass vector) in order to 
-    simulate a galaxy spectrum. 
-                                              Costa-Duarte, M.V. - 10/04/2013
-    """
-
     x[:] = 0.
     if len(x) == 1: # Only 1 component 
         x[0] = 1.
     else: # More than 1 component    
-
         sum_x = 0.
         flag_idx = np.zeros(len(x))
-
         while len(flag_idx[(flag_idx == 1)]) < len(x):
             idx = int(float(len(x)) * np.random.uniform(low=0.,high=1.))
             if flag_idx[idx] == 0.:
                 if len(flag_idx[(flag_idx == 1)]) == len(x)-1: 
                     x[idx] = (1. - sum_x)
                     flag_idx[idx] = 1.
-
                 else:
-
                     x[idx] = (1. - sum_x) * abs(np.random.uniform(low=0.,high=1.))
                     sum_x = sum_x + x[idx]
                     flag_idx[idx] = 1.
     return x
 #########################################################################################
-
+#
+# This routine masks a spectrum by using a file_mask and resamples it after discarting
+# masked regions + bad pixels.
+# flag=99 # bad pixel for spectral synthesis
+#                                            Costa-Duarte, M.V. - 07/07/2014
+########################################################################################
 def mask_spec(l,f,error,flag,file_mask,l_out):
-    """
-    This routine masks a spectrum by using a file_mask and resamples it after discarting
-    masked regions + bad pixels.
-    flag=99 # bad pixel for spectral synthesis
-                                              Costa-Duarte, M.V. - 07/07/2014
-    """
     # Numpy arrays
     l0 = np.array(l)
     f0 = np.array(f)
     error0 = np.array(error)
     flag0 = np.array(flag)
-
     # 1st line
     lines = [line.strip() for line in open(file_mask)]
     lresam = l_out # New lambda-vector
-
     # 
     n_mask = int(lines[0].split()[0])    # Number lambda windows of the MASK
     l_mask_i = []
@@ -480,39 +439,31 @@ def mask_spec(l,f,error,flag,file_mask,l_out):
         l_mask_f.append(float(lines[i+1].split()[1])) # lambda_mask_final
     l_mask_i = np.array(l_mask_i)
     l_mask_f = np.array(l_mask_f)
-
     # Deleting masked regions
-
     flag_mask = np.zeros(len(l0))
     for i in range(n_mask):    
         idx = [(l0 >= l_mask_i[i]) & (l0 <= l_mask_f[i])]
         flag_mask[idx] = 99999.
     idx_flag = [(flag_mask <> 99999.) & (flag0 <= 1)] # Masked regions + bad pixels
-
     # Resampling of Flux and Error_flux
-
     fresam = np.interp(lresam,l0[idx_flag],f0[idx_flag],left = 0.0,right = 0.0)
     error_resam = np.interp(lresam,l0[idx_flag],error0[idx_flag], left = 0.0, right = 0.0)
-
     # Resampling of Flag
-
     flag_resam = np.zeros(len(lresam)) # Resampling -> flag
     for j in range(len(lresam)):
         idx = (np.abs(l0-lresam[j])).argmin()
         flag_resam[j] = flag0[idx]
     flag_resam[fresam == 0.] = 99  # Flux = 0. are flagged as 99 (not considered in synthesis!)
-
     return lresam,fresam,error_resam,flag_resam
-
 ################################################################################
-
+#
+# This routine calculates the D4000-break of a spectrum, following the
+# Balogh+99 (http://adsabs.harvard.edu/abs/1999ApJ...527...54B) formalism. 
+#
+#                                           Costa-Duarte, M. V. - 14/04/2015
+################################################################################
 def calc_D4000(l,f,error,lambda_D4000_blue_i,lambda_D4000_blue_f,lambda_D4000_red_i,lambda_D4000_red_f):
-    """
-    This routine calculates the D4000-break of a spectrum, following the
-    Balogh+99 (http://adsabs.harvard.edu/abs/1999ApJ...527...54B) formalism. 
 
-                                             Costa-Duarte, M. V. - 14/04/2015
-    """
     # C_red
     C_red=0.
     C_red_error=0.
@@ -550,42 +501,33 @@ def calc_D4000(l,f,error,lambda_D4000_blue_i,lambda_D4000_blue_f,lambda_D4000_re
         D4000_error = -99999.
 
     return D4000,D4000_error
-
 ########################################################################################
-
+#
+# This routine reads/loads the BC03 spectrum. 
+#
+#                                     Costa-Duarte, M.V. - 13/04/2014
+########################################################################################
 def load_ssp_bc03(infile):
-    """
-
-    This routine loads BC03 spectrum. 
-
-                                     Costa-Duarte, M.V. - 13/04/2014
-    """
     data = [line.strip() for line in open(infile)]
-  
     l = []
     f = []
     for i in range(6,len(data)): # 6 lines header
         l.append(float(data[i].split()[0]))
         f.append(float(data[i].split()[1]))
-  
     f = np.array(f)
     l = np.array(l)
-  
     return l,f
-
 #########################################################################################
-
+#
+# This routine adds some noise to a spectrum by considering its pixel error array.
+#
+#                f_noisy = f * (1 + gasdev * error_vector / SN)
+#
+# ATTENTION: It's necessary to NORMALIZE the error vector before this routine
+#
+#                                              Costa-Duarte - 17/12/2014
+#########################################################################################
 def add_noise_SSP(l,f,l_error,vec_error,SN):
-    """
-    This routine adds some noise to a spectrum by considering its pixel error array.
-
-                  f_noisy = f * (1 + gasdev * error_vector / SN)
-
-    ATTENTION: It's necessary to BRING the error vector to the flux amplitude (respect the SN ratio) 
-    before using this routine.
-
-                                                Costa-Duarte - 17/12/2014
-    """
     #
     f_out = np.zeros(len(l))
     for j in range(len(l)):
@@ -597,120 +539,115 @@ def add_noise_SSP(l,f,l_error,vec_error,SN):
         if l[j] > max(l_error): # l[j] is out of error range -> Consider 1st array element
             f_out[j] = f[j] * (1. + np.random.normal(0.,1.,len(l)) * vec_error[len(vec_error)-1] / SN) 
     return f_out
-
 #########################################################################################
-
+#
+# This routine converts mask vector from SDSS fits file of spectra to mask 
+# for STARLIGHT. 
+#                                             Costa-Duarte, M.V., 09/02/2014
+#########################################################################################
 def mask2flag(mask):
-    """
-    This routine converts mask vector from SDSS fits file of spectra to mask 
-    for STARLIGHT. 
 
+  import numpy as np
 
-    from ABILIO's code...
-
-       FLAGS:
-
-       0: OK pixel
-       1: emission line
-       > 1: problems...
-
-
-
-                                               Costa-Duarte, M.V., 09/02/2014
-    """
+#
+# from ABILIO's code...
+#
+#     FLAGS:
+#
+#     0: normal pixel
+#     1: emission line
+#     > 1: problems...
+#
   
-    r=np.zeros(10)    
-    r[0] = 262144      # FULLREJECT
-    r[1] = 524288      # PARTIALREJ
-    r[2] = 4194304     # NOSKY
-    r[3] = 8388608     # BRIGHTSKY
-    r[4] = 16777216    # NODATA
-    r[5] = 33554432    # COMBINEREJ
-    r[6] = 67108864    # BADFLUXFACTOR
-    r[7] = 134217728   # BADSKYCHI
-    r[8] = 268435456   # REDMONSTER
-    r[9] = 1073741824  # EMLINE
-  #
-    nl=len(mask)
-    flag=np.zeros(nl)
-  #
-    for i in range(0,nl):
-        flag[i]=0 # pixel OK!
-        if mask[i] >= r[9]: flag[i]=1 # EMLINE
-        if mask[i] >= r[9]+r[0] and mask[i] < r[9]+r[1]: flag[i]=2 #EMLINE + FULLREJ
-        if mask[i] >= r[9]+r[2] and mask[i] < r[9]+r[3]: flag[i]=3 #EMLINE + NOSKY
-        if mask[i] >= r[9]+r[3] and mask[i] < r[9]+r[4]: flag[i]=4 #EMLINE + SKY
-        if mask[i] >= r[9]+r[4] and mask[i] < r[9]+r[5]: flag[i]=5 #EMLINE + NODATA
-        if mask[i] >= r[9]+r[7] and mask[i] < r[9]+r[8]: flag[i]=6 #EMLINE + BADSKY
-        if mask[i] >= r[9]+r[7]+r[3] and mask[i] < r[9]+r[8]: flag[i]=7 #EMLINE + BADSKY + SKY
-        if mask[i] >= r[0] and mask[i] < r[1]: flag[i]=8 #FULLREJECT
-        if mask[i] >= r[2] and mask[i] < r[3]: flag[i]=9 # NOSKY
-        if mask[i] >= r[3] and mask[i] < r[4]: flag[i]=10 #SKY
-        if mask[i] >= r[3]+r[4] and mask[i] < r[5]: flag[i]=11 #SKY + NODATA
-        if mask[i] >= r[4] and mask[i] < r[5]: flag[i]=12 #NODATA
-        if mask[i] >= r[6] and mask[i] < r[7]: flag[i]=13 #BADFLUXFACTOR
-        if mask[i] >= r[6]+r[4] and mask[i] < r[6]+r[5]: flag[i]=14 #BADFLUX + NODATA
-        if mask[i] >= r[6]+r[3] and mask[i] < r[6]+r[4]: flag[i]=15 #BADFLUX + SKY
-        if mask[i] >= r[7] and mask[i] < r[8]: flag[i]=16  #BADSKY
-        if mask[i] >= r[7]+r[3] and mask[i] < r[7]+r[4]: flag[i]=17 #BADSKY + SKY
-        if mask[i] >= r[7]+r[3]+r[0] and mask[i] < r[7]+r[3]+r[1]: flag[i]=18 #BADSKY + SKY + FULLREJ
-        if mask[i] >= r[8] and mask[i] < r[9]: flag[i]=19 #REDMONSTER
-
-    return flag
-
+  r=np.zeros(10)    
+  r[0] = 262144      # FULLREJECT
+  r[1] = 524288      # PARTIALREJ
+  r[2] = 4194304     # NOSKY
+  r[3] = 8388608     # BRIGHTSKY
+  r[4] = 16777216    # NODATA
+  r[5] = 33554432    # COMBINEREJ
+  r[6] = 67108864    # BADFLUXFACTOR
+  r[7] = 134217728   # BADSKYCHI
+  r[8] = 268435456   # REDMONSTER
+  r[9] = 1073741824  # EMLINE
+#
+  nl=len(mask)
+  flag=np.zeros(nl)
+#
+  for i in range(0,nl):
+   flag[i]=0 # pixel OK!
+   if mask[i] >= r[9]: flag[i]=1 # EMLINE
+   if mask[i] >= r[9]+r[0] and mask[i] < r[9]+r[1]: flag[i]=2 #EMLINE + FULLREJ
+   if mask[i] >= r[9]+r[2] and mask[i] < r[9]+r[3]: flag[i]=3 #EMLINE + NOSKY
+   if mask[i] >= r[9]+r[3] and mask[i] < r[9]+r[4]: flag[i]=4 #EMLINE + SKY
+   if mask[i] >= r[9]+r[4] and mask[i] < r[9]+r[5]: flag[i]=5 #EMLINE + NODATA
+   if mask[i] >= r[9]+r[7] and mask[i] < r[9]+r[8]: flag[i]=6 #EMLINE + BADSKY
+   if mask[i] >= r[9]+r[7]+r[3] and mask[i] < r[9]+r[8]: flag[i]=7 #EMLINE + BADSKY + SKY
+   if mask[i] >= r[0] and mask[i] < r[1]: flag[i]=8 #FULLREJECT
+   if mask[i] >= r[2] and mask[i] < r[3]: flag[i]=9 # NOSKY
+   if mask[i] >= r[3] and mask[i] < r[4]: flag[i]=10 #SKY
+   if mask[i] >= r[3]+r[4] and mask[i] < r[5]: flag[i]=11 #SKY + NODATA
+   if mask[i] >= r[4] and mask[i] < r[5]: flag[i]=12 #NODATA
+   if mask[i] >= r[6] and mask[i] < r[7]: flag[i]=13 #BADFLUXFACTOR
+   if mask[i] >= r[6]+r[4] and mask[i] < r[6]+r[5]: flag[i]=14 #BADFLUX + NODATA
+   if mask[i] >= r[6]+r[3] and mask[i] < r[6]+r[4]: flag[i]=15 #BADFLUX + SKY
+   if mask[i] >= r[7] and mask[i] < r[8]: flag[i]=16  #BADSKY
+   if mask[i] >= r[7]+r[3] and mask[i] < r[7]+r[4]: flag[i]=17 #BADSKY + SKY
+   if mask[i] >= r[7]+r[3]+r[0] and mask[i] < r[7]+r[3]+r[1]: flag[i]=18 #BADSKY + SKY + FULLREJ
+   if mask[i] >= r[8] and mask[i] < r[9]: flag[i]=19 #REDMONSTER
+#
+  return flag
 #########################################################################################
-
+#
+## Index a vector for N highest values.
+#
+########################################################################################
 def idx_n_highest_values(a,N):
-    """
-    Index of the highest value in an array
-    """
     return np.argsort(a)[::-1][:N]
-
 #########################################################################################
-
-def class_whan(xx,yy,EW_NII):
-    """
-    This routine classifies galaxies by using emission lines with WHAN diagram.
-    (Cid Fernandes et al 2011)
-                                                   Costa-Duarte - 12/11/2014
-    """
+#
+# This routine classifies galaxies by using emission lines with WHAN diagram.
+# (Cid Fernandes et al 2011)
+#                                                 Costa-Duarte - 12/11/2014
+########################################################################################
+def class_whan(xx,yy,EW_NII,SN,SN_min):
     #
     class_gal = 0.
-    # SF
-    if xx <= -0.4 and yy > np.log10(3.):
-        class_gal = 1.
-    # sAGN
-    if xx > -0.4 and yy > np.log10(6.):
-        class_gal = 2.
-    # wAGN
-    if xx > -0.4 and yy >= np.log10(3.) and yy <= np.log10(6.):
-        class_gal = 3.
-    # retired
-    if yy < np.log10(3.):
-        class_gal = 4.
-    # passive
-    if yy <= np.log10(0.5) and EW_NII <= np.log10(0.5):
-        class_gal = 5.
-    # Any problem? NO classification?
-    if class_gal == 0.:
-        print 'PROBLEM - NO CLASSIFICATION'
-        exit()
+    if SN[0] > SN_min and SN[1] >= SN_min: # Signal-to-noise criteria 
+        # SF
+        if xx <= -0.4 and yy > np.log10(3.):
+            class_gal = 1.
+        # sAGN
+        if xx > -0.4 and yy > np.log10(6.):
+            class_gal = 2.
+        # wAGN
+        if xx > -0.4 and yy >= np.log10(3.) and yy <= np.log10(6.):
+            class_gal = 3.
+        # retired
+        if yy < np.log10(3.):
+            class_gal = 4.
+        # passive
+        if yy <= np.log10(0.5) and EW_NII <= np.log10(0.5):
+            class_gal = 5.
+        # Any problem? NO classification?
+        if class_gal == 0.:
+            print 'PROBLEM - NO CLASSIFICATION'
+            exit()
     return class_gal
 #########################################################################################
-def class_whan_condensed(xx, yy):
-    """
-
-    This routine classifies galaxies by using emission lines with WHAN diagram.
-    (Cid Fernandes et al 2011)
-
-    This diagram is condensed because we put s+wAGN and passive + retired in the same class
-
-        SF - 1
-        s+w AGN - 2
-        passive + retired - 3
-
-                                                   Costa-Duarte - 12/11/2014
-    """
+#
+# This routine classifies galaxies by using emission lines with WHAN diagram.
+# (Cid Fernandes et al 2011)
+#
+# This diagram is condensed because we put s+wAGN and passive + retired in the same class
+#
+#      SF - 1
+#      s+w AGN - 2
+#      passive + retired - 3
+#
+#                                                 Costa-Duarte - 12/11/2014
+########################################################################################
+def class_whan_condensed(xx,yy):
     #
     class_gal = 0.
     # SF (class=1)
@@ -728,37 +665,33 @@ def class_whan_condensed(xx, yy):
     # passive (class=3)
     if yy <= np.log10(0.5):
         class_gal = 3.
-        
-    #print xx, yy, class_gal
 
     # Any problem? NO classification?
     if class_gal == 0.:
         print 'PROBLEM - NO CLASSIFICATION'
         exit()
     return class_gal
-
 #########################################################################################
-
+#
+# This routine calculates the sky distance in arcsec (Haversine equation). 
+#
+#                                               Costa-Duarte, M.V. - 10/12/2014
+########################################################################################
 def dist_sky_arcsec(ra1,dec1,ra2,dec2):
-    """
-    This routine calculates the sky distance in arcsec (Haversine equation). 
-
-                                                 Costa-Duarte, M.V. - 10/12/2014
-    """
     d2r=np.pi/180.                       # degree2radian
     arcs2r = np.pi/(180. * 3600.) # arcsec2radian
-    return np.arccos(np.sin(dec1*d2r)*np.sin(dec2*d2r)+np.cos(dec1*d2r)*np.cos(dec2*d2r)*np.cos(ra1*d2r-ra2*d2r)) / arcs2r
-
+    dist = np.arccos(np.sin(dec1*d2r)*np.sin(dec2*d2r)+np.cos(dec1*d2r)*np.cos(dec2*d2r)*np.cos(ra1*d2r-ra2*d2r)) / arcs2r
+    #if np.isnan(dist) == True: dist = 0.
+    return dist
 #########################################################################################
-
+#
+# This routine calculates the recent (t<tmax) SFR according to the light vector 
+# of the STARLIGHT output. The luminosity distance (DL) is necessary in order to 
+# estimate the stellar mass (M*) and consequently the SFR (Msun/yr).
+#
+#                                      Costa-Duarte, M.V. 15/11/2014
+########################################################################################
 def calc_SFR(infile,dl,tmax):
-    """
-    This routine calculates the recent (t<tmax) SFR according to the light vector 
-    of the STARLIGHT output. The luminosity distance (DL) is necessary in order to 
-    estimate the stellar mass (M*) and consequently the SFR (Msun/yr).
-
-                                        Costa-Duarte, M.V. 15/11/2014
-    """
 #    Read the infile
     lines = [line.strip() for line in open(infile)]
 #
@@ -773,40 +706,34 @@ def calc_SFR(infile,dl,tmax):
     for i in range(int(nel_base)):
         x[i] = lines[63+i].split()[1]    
         mu[i] = lines[63+i].split()[3]  
-        age[i] = lines[63+i].split()[4]  # in lookback time years
+        age[i] = lines[63+i].split()[4]  
         Z[i] = lines[63+i].split()[5]
-
+    #
     # Mass fraction of recent (t<tmax) star formation
-
     idx = [(age < tmax)]
     if len(age[idx]) > 0:
         frac_mass_recent_sf = sum(mu[idx])/sum(mu)
     else:
         frac_mass_recent_sf = 0.
-
-    # SFR = M_ini *(recent, t<tmax) / tmax
-
+    #
+    # SFR = M*(recent, t<tmax) / tmax
     SFR = (frac_mass_recent_sf * Mini) / tmax # Msun/yr
-
     return SFR
-
 ########################################################################################
-
+#
+# This routine reads the ELINE files (Abilio's code to measure emission lines).
+# Given an array of lambdas of emission lines, they select the values of
+# flux, EW, velocity dispersion, velocity (and their errors) and signal-to-noise
+# of the emission lines. 
+#                                      Costa-Duarte, M.V., 01/12/2014
+#
+# Header Abilio's code for eline outfiles:
+#
+#      lline(k),Ie(k),sigIe(k),EWe(k),sigEWe(k),
+#      sigma(k),sig_sigma(k),v0_e(k),sig_v0_e(k),
+#      SNe(k),fcontinuum(k),sigfcontinuum(k),chisqr(k)
+########################################################################################
 def read_eline(infile,l_eline):
-    """
-    This routine reads the ELINE files (Abilio's code to measure emission lines).
-    Given an array of lambdas of emission lines, they select the values of
-    flux, EW, velocity dispersion, velocity (and their errors) and signal-to-noise
-    of the emission lines. 
-                                        Costa-Duarte, M.V., 01/12/2014
-
-    Header Abilio's code for eline outfiles:
-
-        lline(k),Ie(k),sigIe(k),EWe(k),sigEWe(k),
-        sigma(k),sig_sigma(k),v0_e(k),sig_v0_e(k),
-        SNe(k),fcontinuum(k),sigfcontinuum(k),chisqr(k)
-
-    """
     #    Read the infile
     lines0 = [line.strip() for line in open(infile)]
     #
@@ -855,7 +782,7 @@ def read_eline(infile,l_eline):
             v0.append(-99999.)
             v0_sig.append(-99999.)
             SN.append(-99999.)
-
+    #
     l = np.array(l)
     F = np.array(F)
     F_sig = np.array(F_sig)
@@ -866,18 +793,15 @@ def read_eline(infile,l_eline):
     v0 = np.array(v0)
     v0_sig = np.array(v0_sig)
     SN = np.array(SN)
-
     return l,F,F_sig,EW,EW_sig,veldisp,veldisp_sig,v0,v0_sig,SN   
-
 ###################################################################################
-
+#
+# This routine checks the fraction of bad pixels at the regions 
+# of emission lines. For each eline, a fraction of bad pixels is given.
+#
+#                                            Costa-Duarte, M.V. - 01/12/2014
+####################################################################################
 def check_bad_pixels(l, f, error, flag, l_eline, v0, sigma, nsigma):
-    """
-    This routine checks the fraction of bad pixels at the regions 
-    of emission lines. For each eline, a fraction of bad pixels is output.
-
-                                              Costa-Duarte, M.V. - 01/12/2014
-    """
     # 
     c = 299792.458 # light speed (km/s)
 
@@ -950,58 +874,48 @@ def kcorrect_omill_sdss(mg,mr,redshift):
           kc[i] =  (a_A[i] * (mg - mr) + b_A[i]) * redshift + (a_B[i] * (mg - mr) + b_B[i])
      return kc
 ########################################################################################
-
+#
+# Calculate the Absolute magnitude, given magnitude and luminosity distance.
+# mag - magnitude corrected by extinction, offset and k-correction
+#      mag = m(raw) - extinction + offset + kc
+# dl - luminosity distance (in Mpc)
+#
+#                                      Costa-Duarte, M.V. - 03/12/2014
+########################################################################################
 def mag2Mabs(mag,dl):
-    """
-    Calculate the Absolute magnitude, given magnitude and luminosity distance.
-    mag - magnitude corrected by extinction, offset and k-correction
-        mag = m(raw) - extinction + offset + kc
-    dl - luminosity distance (in Mpc)
-
-                                        Costa-Duarte, M.V. - 03/12/2014
-    """
 #
     Mabs = mag - 5. * np.log10(dl) - 25.
     return Mabs
-
 ########################################################################################
-
+#
+# This routine transform flux (in units of 10^-17 erg/s/A/cm2) into AB magnitudes.
+# The value of l_eff is calculated according to the routine "synthetic_photometry".  
+#
+#                                             Costa-Duarte - 10/12/2014
+########################################################################################
 def flux2magAB(F_l_eff,F_l_eff_error,l_eff):
-    """
-
-     This routine transform flux (in units of 10^-17 erg/s/A/cm2) into AB magnitudes.
-     The value of l_eff is calculated according to the routine "synthetic_photometry".  
-
-                                                 Costa-Duarte - 10/12/2014
-    """
-
     # light speed in Angstroms/s  
     c=2.99792458e18
-
     # magAB - F_l_eff in 10^-17 erg/s/A/cm2
     magAB = -2.5 * np.log10((F_l_eff * l_eff ** 2) / c) - 6.1
-
     # magAB error: sqrt( (-2.5) ** 2) * (1/(F_l * ln(10)) * F_l_eff_error  
-    # magAB_error = np.sqrt((-2.5) ** 2) * (1. / (F_l_eff * np.log(10.)) * F_l_eff_error
-    magAB_error = -99999.
-
+#    magAB_error = np.sqrt((-2.5) ** 2) * (1. / (F_l_eff * np.log(10.)) * F_l_eff_error
+    magAB_error = 1.
     return magAB,magAB_error
 ########################################################################################
+#
+# This routine loads the transmission filter files of SDSS.
+# All '#' are considered headers and 2 airmass values are avaiable (0. and 1.3).
+#
+#                                           Costa-Duarte - 10/12/2014
+########################################################################################
 def load_sdss_filter(infile,airmass):
-    """
-    This routine loads the transmission filter files of SDSS.
-    All '#' are considered headers and 2 airmass values are avaiable (0. and 1.3).
-
-                                             Costa-Duarte - 10/12/2014
-    """
-
+    # 
     if airmass <> 0. and airmass <> 1.3:
         print 'Airmass NOT avaiable!'
         print 'SDSS Airmass = 0 or 1.3!'
         exit() 
-
     # Load infile
-
     data = [line.strip() for line in open(infile)]
     l_filter = []
     s_filter = []
@@ -1013,14 +927,14 @@ def load_sdss_filter(infile,airmass):
                 s_filter.append(float(p[3])) # extended source and airmass = 0.
             if airmass == 1.3:
                 s_filter.append(float(p[2])) # extended source and airmass = 1.3
-
+    #
     l_filter = np.array(l_filter)
     s_filter = np.array(s_filter)
-
     return l_filter,s_filter
 ########################################################################################
 def synthetic_photometry(l_spec0,f_spec0,error_spec0,flag_spec0,l_filter0,s_filter0,dlambda):
     """
+
     This routine calculates the convolution of a pass-band filter and a spectrum.
     The resulting flux consists of a synthetic photometry as defined below:
  
@@ -1034,45 +948,38 @@ def synthetic_photometry(l_spec0,f_spec0,error_spec0,flag_spec0,l_filter0,s_filt
 
                                                         Marcus - 10/12/2014
     """
-
+    #
     # Put the observed spectrum at the spectral resolution (dlambda)
-
     l_spec,f_spec,error_spec,flag_spec = interpol_spec(l_spec0, f_spec0, error_spec0, flag_spec0, 
                                          np.round(min(l_spec0)), np.round(max(l_spec0)), dlambda)
-
+    #
     # Put the filter transmission at the spectral resolution (dlambda)
-
     l_filter, s_filter, error_filter,flag_filter = interpol_spec(l_filter0, s_filter0, 
                                                    0.1 * s_filter0, np.zeros(len(l_filter0)), 
                                                    np.round(min(l_spec0)), np.round(max(l_spec0)), dlambda)
-
+    #
     Fl_Sl_dl = 0.
     Fl_Sl_dl_error = 0.
     Sl_dl = 0.
     Sl_l_dl = 0.
     dl = (l_spec[1:] - l_spec[0:len(l_spec)-1])
     l_bins = 0.5 * (l_spec[1:] - l_spec[0:len(l_spec)-1])
-
     # Trapezoidal Integration
+    #
     # Calculate the mean flux inside the bins 
-
     Fl_bins = 0.5 * (f_spec[1:] - f_spec[0:len(f_spec)-1])
     Sl_bins = 0.5 * (s_spec[1:] - s_spec[0:len(s_spec)-1])
     error_bins = 0.5 * (error_spec[1:] - error_spec[0:len(error_spec)-1])
-
     #
     # Integration of Fl * Sl * dl
     Fl_Sl_dl = sum(Fl_bins * Sl_bins * dl)
-
     # Error of Fl * Sl * dl: sqrt(sum d(Fl * Sl * dl)/dF_l)**2 * error_F_l)**2) = sqrt(sum (Sl * dl * error_F_l)**2) 
     Fl_Sl_dl_error = sum((Sl_bins * dl * error_bins) ** 2)
-
     # Integration of Sl * delta_l - NO ERROR in S_l and l
     Sl_dl = sum(Sl_bins * dl)
-
     # Integrartion of Sl * dl
     Sl_l_dl = sum(Sl_bins * l_bins * dl)
-
+    #
     if Fl_Sl_dl <> 0. and Sl_dl <> 0.:
         # Effective Flux
         Fl_eff = Fl_Sl_dl / Sl_dl
@@ -1094,17 +1001,15 @@ def synthetic_photometry(l_spec0,f_spec0,error_spec0,flag_spec0,l_filter0,s_filt
 
     return Fl_eff, Fl_eff_error, l_eff, magAB, magAB_error, flag_output
 ########################################################################################
+#
+# This routine loads the transmission filter files of JPLUS.
+# All '#' are considered headers and is loaded the 
+# Transmission + CCD efficiency (3rd column!).
+#
+#                                           Costa-Duarte - 10/12/2014
+########################################################################################
 def load_jplus_filter(infile):
-    """
-    This routine loads the transmission filter files of JPLUS.
-    All '#' are considered headers and is loaded the 
-    Transmission + CCD efficiency (3rd column!).
-
-                                             Costa-Duarte - 10/12/2014
-    """
-
     # Load filter transmission
-
     data = [line.strip() for line in open(infile)]
     l_filter = []
     s_filter = []
@@ -1113,22 +1018,18 @@ def load_jplus_filter(infile):
         if p[0] <> '#':
             l_filter.append(float(p[0]))
             s_filter.append(float(p[1])) # T + CCD eff
-
     #
     l_filter = np.array(l_filter)
     s_filter = np.array(s_filter)
-
     return l_filter,s_filter
-
 ########################################################################################
-
-def load_jplus_set_filters(infile_list, path_filters, dl):
-    """
-    This routine loads the transmission filter files of JPLUS.
-    All '#' are considered headers.
-
-                                             Costa-Duarte - 10/12/2014
-    """
+#
+# This routine loads the transmission filter files of JPLUS.
+# All '#' are considered headers.
+#
+#                                           Costa-Duarte - 10/12/2014
+########################################################################################
+def load_SPLUS_set_filters(infile_list, path_filters, dl):
 
     # Load list of filters
 
@@ -1165,19 +1066,19 @@ def load_jplus_set_filters(infile_list, path_filters, dl):
     return l_filter_matrix, s_filter_matrix, file_filters
 
 #########################################################################################
+#
+# This routine makes the Y vector according to the x-axis range (array) given 
+# previously. 
+#
+# The lines calculated by several works are:
+#
+# 1 - Stasinska+06
+# 2 - Kewley+01
+# 3 - Kauffmann+03 
+#
+#                                               Costa-Duarte - 17/12/2014
+#########################################################################################
 def BPT_lines(x,str_line):
-    """
-    This routine makes the Y vector according to the x-axis range (array) given 
-    previously. 
-
-    The lines calculated by several works are:
-
-    1 - Stasinska+06
-    2 - Kewley+01
-    3 - Kauffmann+03 
-
-                                                 Costa-Duarte - 17/12/2014
-    """
     # Stasinska+06 line
     if str_line == 'stasinska':
         y = (-30.787 + 1.1358 * x + 0.27297 * x * x) * np.tanh(5.7409 * x) - 31.093
@@ -1189,54 +1090,83 @@ def BPT_lines(x,str_line):
         y = 0.61 / (x - 0.05) + 1.3
     return y
 #########################################################################################
+#
+# This routine classifies galaxies in BPT diagram according to Kauffmann et al (2003)
+# and Kewley et al (2001). These galaxies are classified as:
+#
+# 1 - Star-forming: below Kauffmann et al (2003)'s curve.
+# 2 - Composite: Between Kauffmann et al 2003's and Kewley et al (2001)'s curves.
+# 3 - AGNs: Above Kewley et al (2001)'s curve.
+#
+#                                               Costa-Duarte - 17/12/2014
+#########################################################################################
 def class_BPT_kauffmann_kewley(x, y):
-    """
-    This routine classifies galaxies in BPT diagram according to Kauffmann et al (2003)
-    and Kewley et al (2001). These galaxies are classified as:
-
-    https://sites.google.com/site/agndiagnostics/home/bpt
-
-    x = log([NII]/Ha) and y = log([OIII]/Hb)
-
-    1 - Star-forming: below Kauffmann et al (2003)'s curve.
-    2 - Composite: Between Kauffmann et al 2003's and Kewley et al (2001)'s curves.
-    3 - AGNs: Above Kewley et al (2001)'s curve.
-
-
-                                                 Costa-Duarte - 17/12/2014
-    """
-
+    #
+    # https://sites.google.com/site/agndiagnostics/home/bpt
+    #
+    # x = log([NII]/Ha) and y = log([OIII]/Hb)
+    #
     y_kauffmann = 0.61 / (x - 0.05) + 1.3
     y_kewley = 0.61 / (x - 0.47) + 1.19
+    y_schawinski = 1.05 * x + 0.45
 
 #    if x >= 0.05 and x < 0.47: print x, y, y_kewley, y_kauffmann
-
     #
     class_BPT = 0
     if y <= y_kauffmann and y < y_kewley and x < 0.47: class_BPT = 1 # SF
     if y <= y_kauffmann and x < 0.05: class_BPT = 1 # SF
+
     if y >= y_kauffmann and y < y_kewley: class_BPT = 2 # Composite
     if y < y_kewley and x > 0.05 and x < 0.47: class_BPT = 2 # Composite
+
     if y > y_kewley and y >= y_kauffmann: class_BPT = 3 # AGN
     if x > 0.47: class_BPT = 3 # AGN
 
-    # At the extreme left of the diagram, these curves cross each other, then...(rarely!)
+    if y >= y_kewley and y >= y_schawinski: class_BPT = 4 # Seyfert AGN
+    if y >= y_kewley and y < y_schawinski: class_BPT = 5 # LINER AGN
+    if x > 0.47 and y < y_schawinski: class_BPT = 5 # LINER AGN
 
+    # At the extreme left of the diagram, these curves cross each other, then...(rarely!)
     if y > y_kewley: class_BPT = 3 # AGN
     #
     if class_BPT == 0:
          print 'PROBLEM BPT_kauffmann_kewley CLASSIFICATION!'
          exit()
-
     return class_BPT
 
 ############################################################################################
-def condensed_vectors(infile):
-    """
-    This routine calculates the condensed vector according to CF+05.
+def class_BPT_kauffmann_kewley_condensed(x, y):
+    #
+    # https://sites.google.com/site/agndiagnostics/home/bpt
+    #
+    # x = log([NII]/Ha) and y = log([OIII]/Hb)
+    #
+    y_kauffmann = 0.61 / (x - 0.05) + 1.3
+    y_kewley = 0.61 / (x - 0.47) + 1.19
 
-                                   Costa-Duarte - 17/12/2014
-    """
+    class_BPT = 0
+    if y <= y_kauffmann and y < y_kewley and x < 0.47: class_BPT = 1 # SF
+    if y <= y_kauffmann and x < 0.05: class_BPT = 1 # SF
+
+    if y >= y_kauffmann and y < y_kewley: class_BPT = 2 # Composite
+    if y < y_kewley and x > 0.05 and x < 0.47: class_BPT = 2 # Composite
+
+    if y > y_kewley and y >= y_kauffmann: class_BPT = 3 # AGN
+    if x > 0.47: class_BPT = 3 # AGN
+    if y > y_kewley: class_BPT = 3 # AGN
+
+    if class_BPT == 0:
+         print 'PROBLEM BPT_kauffmann_kewley CLASSIFICATION!'
+         print 'x, y', x, y
+         exit()
+    return class_BPT
+
+################################################################################
+#
+# This routine calculates the condensed vector according to CF+05.
+#
+############################################################################################
+def condensed_vectors(infile):
 
     # Read the infile
     lines = [line.strip() for line in open(infile)]
@@ -1278,7 +1208,7 @@ def condensed_vectors(infile):
     mu_ini_cond[2] = sum(mu_ini[(age > 1e9)])
     mu_cor_cond[2] = sum(mu_cor[(age > 1e9)])
 
-    return x_cond,mu_ini_cond,mu_cor_cond
+    return x_cond, mu_ini_cond, mu_cor_cond
 #########################################################################
 def plot_quartiles(x,y,nbin):
     """
@@ -1291,22 +1221,28 @@ def plot_quartiles(x,y,nbin):
 
     qx = np.zeros(nbin+1)
     delta_bin = 100. / float(nbin)
+  
+    print 'define limits', delta_bin
     for i in range(len(qx)):
-        qx[i] = np.percentile(x,delta_bin*i)
-        #print qx[i],delta_bin*i
-    
+        qx[i] = np.percentile(x,delta_bin*float(i))
+        print i, qx[i], delta_bin * float(i) 
+
     # For each bin, calculate the quartiles and median
     q1_y = np.zeros(len(qx)-1)
     med_y = np.zeros(len(qx)-1)
     q2_y = np.zeros(len(qx)-1)
     x_out = np.zeros(len(qx)-1)
+    print 'selecting points'
     for i in range(len(qx)-1):
 
         # Selecting points inside the bin
+
         idx = [(x >= qx[i]) & (x < qx[i+1])]
         x_out[i] = (qx[i] + qx[i+1]) / 2.
- 
-        if len(y[idx]) >= 2:
+
+        print i, qx[i], qx[i+1], len(y[idx])
+
+        if len(y[idx]) > 0: 
 
             # Calculating the quartiles and median values inside this x-bin
 
@@ -1315,17 +1251,17 @@ def plot_quartiles(x,y,nbin):
             q2_y[i] = np.percentile(y[idx],75)
 
     return q1_y, med_y, q2_y, x_out
+
+#########################################################################################
+#
+# This routine reads the mu_ini and generates a cumulative mass assembly vector based on
+# the spectral synthesis results. Basically uses mu_ini and ages of SSPs.
+#
+#  Following Asari+07 formalism (http://arxiv.org/pdf/0707.3578v1.pdf)
+#
+#                                      Costa-Duarte, M.V. 26/05/2015
 ########################################################################################
 def mass_assembly(infile,Mini,deltat_dex):
-    """
-
-     This routine reads the mu_ini and generates a cumulative mass assembly vector based on
-     the spectral synthesis results. Basically uses mu_ini and ages of SSPs.
-
-      Following Asari+07 formalism (http://arxiv.org/pdf/0707.3578v1.pdf)
-
-                                       Costa-Duarte, M.V. 26/05/2015
-    """
 
     tmax = 13.5e9 # Maximum age (t < t_age_Universe)
     Zsun = 0.02   # Solar metallicity
@@ -1399,31 +1335,25 @@ def mass_assembly(infile,Mini,deltat_dex):
         Z[i] = sum(mu_cor0[idx] * (Z0[idx] / Zsun)) / sum(mu_cor0[idx])
 
     return mass_assembly, SFR, SSFR, Z, 10**age_mass_assembly
-
 #########################################################################################
-
+#
+# This routine defines the gaussian filter.
+#
+#                                      Costa-Duarte, M.V. 30/05/2015
+#########################################################################################
 def gaussian_filter(x,mu,sigma):
-    """
-    This routine draws the gaussian profile.
 
-                                        Costa-Duarte, M.V. 30/05/2015
-    """
     return np.exp(-((x-mu)**2)/(2.*sigma**2))
-
+#########################################################################################
+#
+# This routine smoothes an array (light/mass vector) from the spectral synthesis
+# by using a gaussian filter with "sigma" as standard deviation in log scale (~ 1dex).
+#
+#                                      Costa-Duarte, M.V. 30/05/2015
 ########################################################################################
-
 def smooth_vector(vector,age,new_age,sigma):
-    """
-
-    This routine smoothes an array (light/mass vector) from the spectral synthesis
-    by using a gaussian filter with "sigma" as standard deviation in log scale (~ 1dex).
-
-                                        Costa-Duarte, M.V. 30/05/2015
-    """
-
 
     # Define new vector
-
     new_vector = np.zeros(len(new_age))
  
     for i in range(len(new_vector)):
@@ -1433,21 +1363,17 @@ def smooth_vector(vector,age,new_age,sigma):
  
         # Smoothing it...
         new_vector[i] = sum(vector[idx] * gaussian_filter(age[idx],new_age[i],sigma)) / sum(gaussian_filter(age[idx],new_age[i],sigma))  
-
     return new_vector
-
+#########################################################################################
+#
+# This routine reads the population vectors and generates a metallicity evolution
+# vector. 
+#                                      Costa-Duarte, M.V. 20/07/2015
 ########################################################################################
-
 def Z_evolution(infile,deltat_dex):
-    """
 
-    This routine reads the population vectors and generates a metallicity evolution
-    vector. 
-                                        Costa-Duarte, M.V. 20/07/2015
-
-    """
     tmax = 13.5e9 # Maximum age (t < t_age_Universe)
-    Zsun = 0.019   # Solar metallicity
+    Zsun = 0.02   # Solar metallicity
 
     # Read the infile
     lines = [line.strip() for line in open(infile)]
@@ -1513,37 +1439,96 @@ def Z_evolution(infile,deltat_dex):
     #print 'bla - mass assembly'
 
     return mass_assembly, SFR, SSFR, Z, 10**age_mass_assembly
-
 #############################################################################
-
+#
+# Convert ra,dec and comoving distance to cartesian coordinates (x,y,z)
+# It is also necessary to give a "shift" in ra to align the cone (alpha0).
+# ATTENTION: ra and dec in degrees!! 
+#                                          13-10-2015 - Costa-Duarte, M.V. 
+#############################################################################
 def convert_ra_dec_xyz(alpha,delta,dist,alpha0,dec0):
-    """
-
-    Convert ra,dec and comoving distance to cartesian coordinates (x,y,z)
-    It is also necessary to give a "shift" in ra to align the cone (alpha0).
-    ATTENTION: ra and dec in degrees!! 
-                                            13/10/2015 - Costa-Duarte, M.V. 
-
-    """
-
+    #
     # Rotating the data in order to get in vertical alignment
-
     if alpha0 == -99999.:
         alpha0 = np.average(alpha) - 90.
     if dec0 == -99999.:
         delta0 = np.average(delta)
-
     # ra,dec -> x,y,z
-
     conv = np.pi / 180.
     x = dist * np.cos((delta - delta0) * conv) * np.cos((alpha - alpha0) * conv)
     y = dist * np.cos((delta - delta0) * conv) * np.sin((alpha - alpha0) * conv)
     z = dist * np.sin((delta - delta0) * conv)
-
     return x,y,z
+#############################################################################
+#
+# Given a lightcone limits, calculate the plot vector
+# 
+#                                          13-10-2015 - Costa-Duarte, M.V. 
+#############################################################################
+#from matplotlib.transforms import Affine2D
+#import mpl_toolkits.axisartist.floating_axes as floating_axes
+#import  mpl_toolkits.axisartist.angle_helper as angle_helper
+#from matplotlib.projections import PolarAxes
+#from mpl_toolkits.axisartist.grid_finder import FixedLocator, MaxNLocator, \
+#     DictFormatter
+#
+#def setup_lightcone(fig, rect, ra, dec, redshift):
+#    """
+#    Sometimes, things like axis_direction need to be adjusted.
+#    """#
+#
+#    # rotate a bit for better orientation
+#    tr_rotate = Affine2D().translate(- 0.5 * (max(ra) - min(ra)) - 90., 0)
+#
+#    # scale degree to radians
+#    tr_scale = Affine2D().scale(np.pi/180., 1.)
+#
+#    tr = tr_rotate + tr_scale + PolarAxes.PolarTransform()
+#
+#    grid_locator1 = angle_helper.LocatorHMS(4)
+#    tick_formatter1 = angle_helper.FormatterHMS()
+#
+#    grid_locator2 = MaxNLocator(5)
+#
+#    ra0, ra1 = min(ra), max(ra)
+#    c = 3e5 # light speed (km/s)
+#    cz0, cz1 = 0. * c, max(redshift) * c
+#    #
+#    grid_helper = floating_axes.GridHelperCurveLinear(tr,
+#                                        extremes=(ra0, ra1, cz0, cz1),
+#                                        grid_locator1=grid_locator1,
+#                                        grid_locator2=grid_locator2,
+#                                        tick_formatter1=tick_formatter1,
+#                                        tick_formatter2=None,
+#                                        )#
+#
+#    ax1 = floating_axes.FloatingSubplot(fig, rect, grid_helper=grid_helper)
+#    fig.add_subplot(ax1)#
+#
+#    # adjust axis
+#    ax1.axis["left"].set_axis_direction("bottom")
+#    ax1.axis["right"].set_axis_direction("top")
+#
+#    ax1.axis["bottom"].set_visible(False)
+#    ax1.axis["top"].set_axis_direction("bottom")
+#    ax1.axis["top"].toggle(ticklabels=True, label=True)
+#    ax1.axis["top"].major_ticklabels.set_axis_direction("top")
+#    ax1.axis["top"].label.set_axis_direction("top")
+#
+#    ax1.axis["left"].label.set_text(r"cz [km$^{-1}$]")
+#    ax1.axis["top"].label.set_text(r"$\alpha_{2000}$")#
+#
+#    # create a parasite axes whose transData in RA, cz
+#    aux_ax = ax1.get_aux_axes(tr)
+#
+#    aux_ax.patch = ax1.patch # for aux_ax to have a clip path as in ax
+#    ax1.patch.zorder=0.9 # but this has a side effect that the patch is
+                        # drawn twice, and possibly over some other
+                        # artists. So, we decrease the zorder a bit to
+                        # prevent this.
 
+#    return ax1, aux_ax
 ##################################################################
-
 def bootstrap(x,n_realization):
     """
         This routine estimates the error of a certain set of 
@@ -1572,7 +1557,6 @@ def bootstrap(x,n_realization):
     return np.std(x0)
 
 ######################################################################
-
 def rescale_array(x, xmin_new, xmax_new):
     """
         This routine "standardlize" a vector x, being the new vector
@@ -1588,7 +1572,7 @@ def rescale_array(x, xmin_new, xmax_new):
 
 ######################################################################
 
-def load_mag_error(path_tables, infile_mean, infile_sigma, nbands):
+def load_mag_error_dgc(path_tables, infile_mean, infile_sigma, nbands):
 
     """
         This routine loads the J-PLUS magnitude uncertainties
@@ -1649,57 +1633,72 @@ def load_mag_error(path_tables, infile_mean, infile_sigma, nbands):
 
 ######################################################################
 
-def mag_uncertainty(mag_range, mag_mean, mag_sigma, mag, idx_mag, lowest_mag_uncertainty):
+def load_mag_error_splus_jplus(path_tables, infile_sigma, nbands):
 
     """
-        This routine interpolates the matrices from J-PLUS magnitude
+        This routine loads the S/J-PLUS magnitude uncertainties.
+
+                                        Marcus - 17/05/2016
+    """
+
+    # Read the infile_sigma
+
+    lines = [line.strip() for line in open(path_tables + infile_sigma)]
+    lines = lines[1:]
+
+    mag_range = np.zeros(len(lines))
+    mag_sigma = np.zeros(len(lines) * nbands).reshape(len(lines), nbands)
+    #
+    nline = -1
+    for line in lines:
+
+        p = line.split()
+
+        if p[0] <> '#':
+
+            nline += 1
+            mag_range[nline] = float(p[0])
+
+            for i in range(nbands):
+
+                mag_sigma[nline, i] = float(p[1 + i])
+   
+    return mag_range, mag_sigma
+
+######################################################################
+
+def mag_uncertainty_splus_jplus(mag_range, mag_sigma, mag, idx_mag, lowest_mag_uncertainty):
+
+    """
+        This routine interpolates the matrices from S/J-PLUS magnitude
         uncertainties and gives you an uncertainty, given the band index
         and the magnitude value. 
 
                                         Marcus - 17/05/2016
     """
-    mag_mean_out = -99999.
     mag_sigma_out = -99999. 
-
-    # Magnitudes brighter than 14, proabably are saturated ones.
-    
-    #if mag < 14:
-    #    print 'magnitude lower than 14! Probably saturated [mag_uncertainty]'
-    #    exit()
 
     # Defining the magnitude bin which the "mag" is contained
 
-    idx_mag_range = -99999.
+    idx_mag_range = -99999
     for i in range(len(mag_range)-1):
         if mag >= mag_range[i] and mag <= mag_range[i+1]:
             idx_mag_range = i
 
-    if mag < mag_range[0]:
-         #print 'extrapolating magnitude uncertainty to lower limit [mag_uncertainty]',mag_range[0], mag
-         mag_mean_out = mag_mean[0, idx_mag]
-         mag_sigma_out = lowest_mag_uncertainty # lowest we can consider for a magnitude.
+    if mag < mag_range[0]: # too bright objects
+        idx_mag_range = 0
 
-    if mag > mag_range[len(mag_range)-1]: 
-         #print 'extrapolating magnitude uncertainty to higher limit [mag_uncertainty]', mag_range[len(mag_range)-1], mag
-         idx_mag_range = len(mag_range)-2
+    if mag > mag_range[len(mag_range)-1]: # too faint object
+        idx_mag_range = len(mag_range)-2
 
-    if mag_mean_out == -99999. and mag_sigma_out == -99999.:
-        #print 'mag=',mag
-        #print 'idx_mag=',idx_mag
-        #print 'idx_mag_range=',idx_mag_range
-        #print np.shape(mag_range)
-        #print np.shape(mag_mean)
+    mag_sigma_out = np.interp(mag, [mag_range[idx_mag_range], mag_range[idx_mag_range + 1]],\
+    [mag_sigma[idx_mag_range, idx_mag], mag_sigma[idx_mag_range + 1, idx_mag]])
 
-        #print mag_range[idx_mag_range], mag_range[idx_mag_range + 1]
-        #print mag_mean[idx_mag_range, idx_mag], mag_mean[idx_mag_range + 1, idx_mag]
-    
-        mag_mean_out = np.interp(mag, [mag_range[idx_mag_range], mag_range[idx_mag_range + 1]],\
-        [mag_mean[idx_mag_range, idx_mag], mag_mean[idx_mag_range + 1, idx_mag]])
-    
-        mag_sigma_out = np.interp(mag, [mag_range[idx_mag_range], mag_range[idx_mag_range + 1]],\
-        [mag_sigma[idx_mag_range, idx_mag], mag_sigma[idx_mag_range + 1, idx_mag]])
+    if mag_sigma_out == -99999.:
+        print '[mag_uncertainty_splus_jplus] mag_sigma_out = -99999.'
+        exit()
 
-    return mag_mean_out, mag_sigma_out
+    return mag_sigma_out
 
 ######################################################################
 
@@ -1754,15 +1753,22 @@ def read_NGSL_spectra(infile, path_spectra, l_out, l_norm_i, l_norm_f):
         fobsnorm_stars[i] = norm_spec(l_out, star_spectra[i],  l_norm_i, l_norm_f)
 
     return star_spectra, fobsnorm_stars
+#############################################################
+#
+# Convert magAB to flux (lambda central and c in AA/s)
+#
+#############################################################
+def magAB2flux(m, lcentral, c):
+    f_nu = 10**(-0.4 * (m + 48.6))
+    f_lambda = (f_nu * c) / (lcentral**2)
+    return f_lambda
 
 #############################################################
-
-def calculate_leff(l, R):
-    """
-     Calculate lambda_eff of a filter transmission
-
-                                           Costa-Duarte - 18/05/2016
-    """
+#
+# Calculate lambda_eff of a filter transmission
+#
+#############################################################
+def leff(l, R):
 
     if len(l) <> len(R):
         print '[leff starlight_tools] len(l) <> l(R)!'
@@ -1780,16 +1786,13 @@ def calculate_leff(l, R):
     leff = sum_lRdl / sum_ldl    
 
     return leff
-
 ########################################################################################
-
+#
+# This routine reads spectral synthesis results and calculate ages and metallicities (STARLIGHTv5).
+#
+#                                              Costa-Duarte, M.V.
+########################################################################################
 def read_synthesis_v5(infile):
-    """
-     This routine reads spectral synthesis results and calculate ages and metallicities (STARLIGHTv5).
-
-                                                  Costa-Duarte, M.V. - 18/05/2016
-    """
-
 #    Read the infile
     lines = [line.strip() for line in open(infile)]
 #
@@ -1839,17 +1842,15 @@ def read_synthesis_v5(infile):
         v0 = -99999.
         sigma = -99999. 
     return nel_base, SN, Mcor, Mini, AV, agemass, agelight, zmass, zlight, v0, sigma, frac_clipped, chi2_red, flag_synthesis_ok
-
+########################################################################################
+#
+# This routine reads an ASCII table, taking specific columns only. 
+# INPUT: index of columns + the type of vatiables.
+#
+#                                              Costa-Duarte, M.V.
 ########################################################################################
 
 def read_ascii_table(infile, header_string, columns, type_variable):
-    """
-
-     This routine reads an ASCII table, taking specific columns only. 
-     INPUT: index of columns + the type of vatiables.
-
-                                                  Costa-Duarte, M.V. - 18/05/2016 
-    """
 
     columns = np.array(columns)
     type_variable = np.array(type_variable)
@@ -1890,15 +1891,13 @@ def read_ascii_table(infile, header_string, columns, type_variable):
     return matrix
 
 ########################################################################################
+#
+# This routine reads the output of the Bayesian Emission Line Fitting Code (BELFI). 
+#
+#                                              Costa-Duarte, M.V.
+########################################################################################
 
 def read_eline_BELFI(infile):
-
-    """
-     This routine reads the output of the Bayesian Emission Line Fitting Code (BELFI). 
-
-                                                  Costa-Duarte, M.V. - 18/05/2016
-
-    """
 
     # Load table
     f = open(infile,'r')
@@ -1929,3 +1928,254 @@ def read_eline_BELFI(infile):
     dEW = np.array(dEW)
 
     return l0, F, dF, EW, dEW
+
+########################################################################################
+#
+# This routine converts FITS files to ASCII ones. 
+#
+#                                              Costa-Duarte, M.V. - 02/08/2017
+########################################################################################
+
+def fits2ascii(infile, outfile):
+
+    import pyfits
+
+    print 
+    print '>> Opening FITS file <<'
+    print infile
+
+    hdulist = fits.open(infile)
+
+    # Load data
+
+    data = hdulist[1].data
+
+    # Number of rows 
+
+    nrow = np.shape(data)[0]
+    print 'nrow=', nrow
+
+    # Columns names
+
+    col_name = hdulist[1].columns.names
+    hdulist.close() # close file
+
+    print 
+    print '>> Output <<'
+    print outfile
+
+    f = open(outfile, 'w')
+
+    # header
+
+    string = ' '.join(col_name[j] for j in range(len(col_name))) + ' \n'
+    f.writelines(string)
+
+    for i in range(nrow): # row-by-row
+
+        if i % 1000 == 0: print i, nrow
+        
+        string = ' '.join(str(data[col_name[j]][i]) for j in range(len(col_name))) + ' \n'
+        f.writelines(string)
+    f.close()
+
+    return
+
+########################################################################################
+#
+# This routine calculates the Completeness and Purity of star/galaxy classification
+# as function of aparent magnitude.  
+#
+#                                              Costa-Duarte, M.V. - 08/08/2017
+########################################################################################
+
+def calc_completeness_purity(mag_range, mag, class_predicted, class_true):
+
+    # Define the magnitude bins
+    mag_bin = 0.5 * (mag_range[1:] + mag_range[:len(mag_range)-1])
+
+    # Define completeness, purity and misclassification (1st col - star, 2nd col - galaxy)
+    completeness = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
+    purity = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
+    misclassification = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
+
+    for i in range(len(mag_bin)):
+
+        # Number of INPUT objects
+        idx_star = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_true == 6.)] # star
+        idx_galaxy = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_true == 3.)] # galaxy
+
+        # Number of RECOVERED objects
+        idx_recovered_star = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_predicted == 6.) & (class_true == 6.)]
+        idx_recovered_galaxy = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_predicted == 3.) & (class_true == 3.)]
+
+        # Number of IDENTIFIED objects
+        idx_identified_star = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_predicted == 6.)]
+        idx_identified_galaxy = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_predicted == 3.)]
+
+        # Number of MISCLASSIFIED objects
+        idx_misclass_star = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_predicted == 6.) & (class_true == 3.)]
+        idx_misclass_galaxy = [(mag > mag_range[i]) & (mag <= mag_range[i+1]) & (class_predicted == 3.) & (class_true == 6.)]
+
+        # Completeness
+
+        #print i, mag_range[i], mag_range[i+1], len(mag[idx_star]), len(mag[idx_galaxy])
+        
+        if float(len(mag[idx_star])) > 0.:
+            completeness[0, i] = float(len(mag[idx_recovered_star])) / float(len(mag[idx_star]))
+        else:
+            completeness[0, i] = -1.
+
+        if float(len(mag[idx_galaxy])) > 0.:
+            completeness[1, i] = float(len(mag[idx_recovered_galaxy])) / float(len(mag[idx_galaxy]))
+        else:
+            completeness[1, i] = -1.
+
+        # Purity and Misclassification
+
+        # stars
+        if float(len(mag[idx_identified_star])) > 0.:
+            purity[0, i] = float(len(mag[idx_recovered_star])) / float(len(mag[idx_identified_star]))
+            misclassification[0, i] = float(len(mag[idx_misclass_star])) / float(len(mag[idx_identified_star]))
+        else:
+            purity[0, i] = -1.
+            misclassification[0, i] = -1.
+
+        # galaxies
+        if float(len(mag[idx_identified_galaxy])) > 0.:
+            purity[1, i] = float(len(mag[idx_recovered_galaxy])) / float(len(mag[idx_identified_galaxy]))
+            misclassification[1, i] = float(len(mag[idx_misclass_galaxy])) / float(len(mag[idx_identified_galaxy]))
+        else:
+            purity[1, i] = -1.
+            misclassification[1, i] = 1.
+
+    return completeness, purity, misclassification, mag_bin
+
+########################################################################
+
+def calc_prob_array(x, bins):
+    """
+    This routine calculates the probability array
+    (acumulated) from the INITIAL distribution
+
+                           M. V. Costa-Duarte 29/09/2017
+    """
+
+    # Calculate the histogram (probs)
+
+    hist, bin_edges = np.histogram(x, bins = bins)
+
+    # Normalize the pop. of the bins
+
+    hist = np.array(hist, dtype = float)
+    prob_norm = np.array(hist / np.sum(hist))
+    #print 'hist', hist
+    #print 'np.sum(prob_norm),len(prob_norm)', np.sum(prob_norm),len(prob_norm)
+
+    prob = np.zeros(len(prob_norm)+1)
+    for i in range(len(prob)):
+        prob[i] = np.sum(prob_norm[:i])
+    #    print i, len(prob), prob[i]
+
+#    prob = [np.sum(prob_norm[:i]) for i in range(len(prob_norm)+1)]
+
+    return prob
+
+########################################################################
+
+def draw_distrib_prob(prob, bin_edges):
+    """
+    This routine generates a set of points in order
+    to draw the INITIAL distribution
+
+                           M. V. Costa-Duarte 29/09/2017
+    """
+    x_out = -99999.
+
+    nrand = np.random.uniform(0., 1., 1)
+    #print 'nrand=', nrand
+
+    for j in range(len(prob)-1):
+
+        #print 'probs', prob[j], prob[j+1], 'bins', bin_edges[j], bin_edges[j+1]
+
+    	if nrand > prob[j] and nrand <= prob[j+1]:
+    	    x_out = np.random.uniform(bin_edges[j], bin_edges[j+1], 1)[0]
+            #print 'found!!!'
+
+    if nrand > prob[len(prob)-1]: 
+        x_out = np.random.uniform(bin_edges[j], bin_edges[j+1], 1)[0]
+
+    if nrand < prob[0]: 
+        x_out = np.random.uniform(bin_edges[0], bin_edges[1], 1)[0]
+
+    #print 'xout=', x_out
+    #exit()
+
+    return x_out
+
+########################################################################
+
+def load_FWHM_ba_S82(infile):
+
+    import h5py 
+    file0 = h5py.File(infile, 'r')
+
+    FWHM_matrix_star = file0['star']['FWHM_matrix_star'].value 
+    ba_matrix_star = file0['star']['ba_matrix_star'].value 
+
+    FWHM_matrix_gal = file0['galaxy']['FWHM_matrix_gal'].value 
+    ba_matrix_gal = file0['galaxy']['ba_matrix_gal'].value 
+
+    bins_FWHM = file0['bins']['bins_FWHM'].value 
+    bins_ba = file0['bins']['bins_ba'].value 
+    mag_range = file0['bins']['mag_range'].value 
+
+    file0.close()
+
+    return FWHM_matrix_star, FWHM_matrix_gal, ba_matrix_star, ba_matrix_gal, \
+    bins_FWHM, bins_ba, mag_range
+
+########################################################################################
+
+def FWHM_ba_mock(FWHM_matrix_star, FWHM_matrix_gal, ba_matrix_star, ba_matrix_gal, \
+    bins_FWHM, bins_ba, mag_range, mag, type_obj):
+
+    FWHM_out = -99999.
+    ba_out = -99999.
+ 
+    #print np.shape(FWHM_matrix_gal), np.shape(ba_matrix_gal)
+    #print np.shape(mag_range), np.shape(bins_FWHM), np.shape(bins_ba)
+    #print 'mag, type_obj', mag, type_obj
+    #print mag_range
+    #exit()
+
+    for i in range(len(mag_range)-1):
+        if mag > mag_range[i] and mag <= mag_range[i+1]:
+
+            if type_obj == 3: # galaxy
+        
+                FWHM_out = draw_distrib_prob(FWHM_matrix_gal[i, :], bins_FWHM)
+                ba_out = draw_distrib_prob(ba_matrix_gal[i, :], bins_ba)
+                
+            if type_obj == 6: # star
+        
+                FWHM_out = draw_distrib_prob(FWHM_matrix_star[i, :], bins_FWHM)
+                ba_out = draw_distrib_prob(ba_matrix_star[i, :], bins_ba)
+
+    # Not lower than the PSF: roughly 3 pixels            
+    #if FWHM_out < 3. and FWHM_out > 0.: FWHM_out = 3.
+
+    if FWHM_out == -99999. or ba_out == -99999.:
+        if mag > mag_range[len(mag_range) - 1]:
+
+            i = len(mag_range) - 2
+            FWHM_out = draw_distrib_prob(FWHM_matrix_star[i, :], bins_FWHM)
+            ba_out = draw_distrib_prob(ba_matrix_star[i, :], bins_ba)
+         
+#            print 'FWHM or ba problems', FWHM_out, ba_out
+#            print 'mag=', mag
+#            print 'type=', type_obj
+        #exit()
+
+    return FWHM_out, ba_out
