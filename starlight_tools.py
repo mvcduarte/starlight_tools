@@ -306,7 +306,7 @@ def calc_SN(l,f,flag,lambda_SN_i,lambda_SN_f):
 #
 #                                                  Costa-Duarte, M.V.
 ########################################################################################
-def make_spec_from_synthesis(file_syn, path_ssp):
+def load_base_synthesis(file_syn, path_ssp):
 
     #   Read the infile
 
@@ -314,21 +314,6 @@ def make_spec_from_synthesis(file_syn, path_ssp):
 
     file_base =  str(lines[6].split()[0])        # Base file
     nel_base = lines[9].split()[0]               # Number of elements of the BASE
-    lambda_norm_i =  float(lines[23].split()[0]) # Normalization initial lambda
-    lambda_norm_f =  float(lines[24].split()[0]) # Normalization final lambda
-    fobsnorm = float(lines[25].split()[0])       # Normalization factor of observed flux
-    sum_x =  float(lines[52].split()[0])         # Sum of the light vector 
-    A_V =  float(lines[59].split()[0])            # Extinction parameter
-
-    #   Light vector
-
-    x = np.zeros(int(nel_base))
-    for i in range(int(nel_base)):
-        x[i] = lines[63+i].split()[1] 
-    #print('sum x=',sum(x))
-    x = x / 100.
-    #print('sum x / 100=',sum(x))
-    #exit()
 
     #   Reading the spectral base 
 
@@ -341,24 +326,56 @@ def make_spec_from_synthesis(file_syn, path_ssp):
     #   Read SSP spectra and make spectrum
 
     for i in range(len(file_ssp)):
-       f = open(path_ssp + file_ssp[i])
-       data = f.readlines()[6:]
-       f.close()
-       # lambda and flux of SSPs
-       l_ssp = []
-       f_ssp = []
-       for line in data:
-           p = line.split()
-           l_ssp.append(float(p[0]))
-           f_ssp.append(float(p[1]))
-       l_ssp = np.array(l_ssp)
-       f_ssp = np.array(f_ssp)
-       if i == 0:
-               f_syn = np.zeros(len(l_ssp))
-               l_syn = l_ssp
-       fobsnorm_ssp = float(norm_spec(l_ssp, f_ssp, lambda_norm_i, lambda_norm_f))
-       f_syn += x[i] * f_ssp / fobsnorm_ssp
-       #print i, x[i] 
+
+         l, f = load_ssp_bc03(path_ssp + file_ssp[i])        
+
+         if i == 0:
+             l_ssp = np.zeros(len(l))
+             f_ssp = np.zeros(len(l) * len(file_ssp)).reshape(len(file_ssp), len(l))
+             l_ssp = l.copy()
+
+         f_ssp[i, :] = f
+
+    return l_ssp, f_ssp
+
+########################################################################################
+#
+# This routine builds a spectrum from synthesis spectrum results (STARLIGHTv4)
+#
+#                                                  Costa-Duarte, M.V.
+########################################################################################
+def make_spec_from_synthesis(file_syn, l_ssp, f_ssp):
+
+    #   Read the infile
+
+    lines = [line.strip() for line in open(file_syn)]
+
+    file_base =  str(lines[6].split()[0])        # Base file
+    nel_base = int(lines[9].split()[0])               # Number of elements of the BASE
+    lambda_norm_i =  float(lines[23].split()[0]) # Normalization initial lambda
+    lambda_norm_f =  float(lines[24].split()[0]) # Normalization final lambda
+    fobsnorm = float(lines[25].split()[0])       # Normalization factor of observed flux
+    sum_x =  float(lines[52].split()[0])         # Sum of the light vector 
+    A_V =  float(lines[59].split()[0])            # Extinction parameter
+    if nel_base <> len(f_ssp[:, 0]):
+        print nel_base, len(f_ssp[:, 0]) 
+        print '[make_spec_from_synthesis] nel_base <> len(f_ssp[0, :])!!!!'
+        exit()
+    
+    #   Light vector
+
+    x = np.zeros(int(nel_base))
+    for i in range(int(nel_base)):
+        x[i] = lines[63+i].split()[1] 
+    x = x / 100.
+
+    #   Make spectrum
+
+    f_syn = np.zeros(len(l_ssp))
+    l_syn = l_ssp.copy()
+    for i in range(len(f_ssp[:, 0])):
+       fobsnorm_ssp = float(norm_spec(l_ssp, f_ssp[i, :], lambda_norm_i, lambda_norm_f))
+       f_syn += x[i] * f_ssp[i, :] / fobsnorm_ssp
 
     #   Add extinction (it is galaxy extinction, not Galactic one)
 
@@ -368,10 +385,11 @@ def make_spec_from_synthesis(file_syn, path_ssp):
 
     #   Normalization to ensure the flux calibration 
 
-    fobsnorm0 = float(norm_spec(l_syn,f_syn,  lambda_norm_i, lambda_norm_f))
+    fobsnorm0 = float(norm_spec(l_syn, f_syn, lambda_norm_i, lambda_norm_f))
     f_syn = (f_syn / fobsnorm0) * fobsnorm
 
     return l_syn, f_syn
+
 #########################################################################################
 #
 # This routines interpolates the spectrum with new resolution (dl) and
@@ -630,9 +648,9 @@ def class_whan(xx,yy,EW_NII,SN,SN_min):
         if yy <= np.log10(0.5) and EW_NII <= np.log10(0.5):
             class_gal = 5.
         # Any problem? NO classification?
-        if class_gal == 0.:
-            print 'PROBLEM - NO CLASSIFICATION'
-            exit()
+        #if class_gal == 0.:
+        #    print 'PROBLEM - NO CLASSIFICATION'
+        #    exit()
     return class_gal
 #########################################################################################
 #
@@ -1100,7 +1118,7 @@ def BPT_lines(x,str_line):
 #
 #                                               Costa-Duarte - 17/12/2014
 #########################################################################################
-def class_BPT_kauffmann_kewley(x, y):
+def class_BPT_kauffmann_kewley(x, y, SN_eline, SN_min):
     #
     # https://sites.google.com/site/agndiagnostics/home/bpt
     #
@@ -1129,9 +1147,15 @@ def class_BPT_kauffmann_kewley(x, y):
     # At the extreme left of the diagram, these curves cross each other, then...(rarely!)
     if y > y_kewley: class_BPT = 3 # AGN
     #
-    if class_BPT == 0:
-         print 'PROBLEM BPT_kauffmann_kewley CLASSIFICATION!'
-         exit()
+    #if class_BPT == 0:
+    #     print 'PROBLEM BPT_kauffmann_kewley CLASSIFICATION!'
+    #     print x, y
+    #     exit()
+
+    # If some SN_eline < threshold, then class = 0
+    if SN_eline[0] < SN_min or SN_eline[1] < SN_min or SN_eline[2] < SN_min or SN_eline[3] < SN_min:
+        class_BPT = 0.
+
     return class_BPT
 
 ############################################################################################
@@ -1876,7 +1900,7 @@ def read_ascii_table(infile, header_string, columns, type_variable):
         nline = -1
         n0 += 1
         #print n0, p[1]
-        if p[0] <> header_string: 
+        if p[0][0] <> header_string: 
             for i in range(len(columns)):
                 nline += 1
                 if type_variable[i] == 0: # string
@@ -1999,6 +2023,11 @@ def calc_completeness_purity(mag_range, mag, class_predicted, class_true):
     purity = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
     misclassification = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
 
+    # Define completeness, purity and misclassification (1st col - star, 2nd col - galaxy)
+    completeness_std = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
+    purity_std = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
+    misclassification_std = np.zeros(2 * len(mag_bin)).reshape(2, len(mag_bin))
+
     for i in range(len(mag_bin)):
 
         # Number of INPUT objects
@@ -2023,33 +2052,45 @@ def calc_completeness_purity(mag_range, mag, class_predicted, class_true):
         
         if float(len(mag[idx_star])) > 0.:
             completeness[0, i] = float(len(mag[idx_recovered_star])) / float(len(mag[idx_star]))
+            completeness_std[0, i] = calc_error_frac(float(len(mag[idx_recovered_star])), float(len(mag[idx_star])), np.sqrt(float(len(mag[idx_recovered_star]))), np.sqrt(float(len(mag[idx_star]))))
         else:
             completeness[0, i] = -1.
+            completeness_std[0, i] = -1.
 
         if float(len(mag[idx_galaxy])) > 0.:
             completeness[1, i] = float(len(mag[idx_recovered_galaxy])) / float(len(mag[idx_galaxy]))
+            completeness_std[1, i] = calc_error_frac(float(len(mag[idx_recovered_galaxy])), float(len(mag[idx_galaxy])), np.sqrt(float(len(mag[idx_recovered_galaxy]))), np.sqrt(float(len(mag[idx_galaxy]))))
         else:
             completeness[1, i] = -1.
+            completeness_std[1, i] = -1.
 
         # Purity and Misclassification
 
         # stars
         if float(len(mag[idx_identified_star])) > 0.:
             purity[0, i] = float(len(mag[idx_recovered_star])) / float(len(mag[idx_identified_star]))
+            purity_std[0, i] = calc_error_frac(float(len(mag[idx_recovered_star])), float(len(mag[idx_identified_star])), np.sqrt(float(len(mag[idx_recovered_star]))), np.sqrt(float(len(mag[idx_identified_star]))))
             misclassification[0, i] = float(len(mag[idx_misclass_star])) / float(len(mag[idx_identified_star]))
+            misclassification_std[0, i] = calc_error_frac(float(len(mag[idx_misclass_star])), float(len(mag[idx_identified_star])), np.sqrt(float(len(mag[idx_misclass_star]))), np.sqrt(float(len(mag[idx_identified_star])))) 
         else:
             purity[0, i] = -1.
+            purity_std[0, i] = -1.
             misclassification[0, i] = -1.
+            misclassification_std[0, i] = -1.
 
         # galaxies
         if float(len(mag[idx_identified_galaxy])) > 0.:
             purity[1, i] = float(len(mag[idx_recovered_galaxy])) / float(len(mag[idx_identified_galaxy]))
+            purity_std[1, i] = calc_error_frac(float(len(mag[idx_recovered_galaxy])), float(len(mag[idx_identified_galaxy])), np.sqrt(float(len(mag[idx_recovered_galaxy]))), np.sqrt(float(len(mag[idx_identified_galaxy]))))
             misclassification[1, i] = float(len(mag[idx_misclass_galaxy])) / float(len(mag[idx_identified_galaxy]))
+            misclassification_std[1, i] = calc_error_frac(float(len(mag[idx_misclass_galaxy])), float(len(mag[idx_identified_galaxy])), np.sqrt(float(len(mag[idx_misclass_galaxy]))), np.sqrt(float(len(mag[idx_identified_galaxy])))) 
         else:
             purity[1, i] = -1.
+            purity_std[1, i] = -1.
             misclassification[1, i] = 1.
+            misclassification_std[1, i] = 1.
 
-    return completeness, purity, misclassification, mag_bin
+    return completeness, purity, misclassification, completeness_std, purity_std, misclassification_std, mag_bin
 
 ########################################################################
 
@@ -2179,3 +2220,10 @@ def FWHM_ba_mock(FWHM_matrix_star, FWHM_matrix_gal, ba_matrix_star, ba_matrix_ga
         #exit()
 
     return FWHM_out, ba_out
+
+def calc_error_frac(a, b, sigma_a, sigma_b):
+    if a <= 0.: 
+        sigma_ab = -99999.
+    else:
+        sigma_ab = (a / b) * np.sqrt(((sigma_a) / a)**2 + ((sigma_b) / b)**2)
+    return sigma_ab
