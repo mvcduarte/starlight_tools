@@ -11,6 +11,7 @@
 import numpy as np
 import bz2
 import matplotlib.pyplot as plt
+from scipy.integrate import simps
 ########################################################################################
 #
 # This routine reads/loads a spectrum. (lambda,flux,error,flag) 
@@ -227,13 +228,12 @@ def Cardelli_RedLaw(l,R_V=3.1):
         @param l: Wavelenght vector (Angstroms)
         @param R_V: R_V factor. Default is R_V = 3.1.
     '''
-# ###########################################################################
 #     q = A_lambda / A_V for Cardelli et al reddening law
 #     l = lambda, in Angstrons
 #     x = 1 / lambda in 1/microns
 #     q = a + b / R_V; where a = a(x) & b = b(x)
 #     Cid@INAOE - 6/July/2004
-#
+
     a = np.zeros(np.shape(l))
     b = np.zeros(np.shape(l))
     F_a = np.zeros(np.shape(l))
@@ -247,7 +247,7 @@ def Cardelli_RedLaw(l,R_V=3.1):
      y[i]=10000. / l[i] - 1.82
 #
 #
-#     Far-Ultraviolet: 8 <= x <= 10 ; 1000 -> 1250 Angs 
+#   Far-Ultraviolet: 8 <= x <= 10 ; 1000 -> 1250 Angs 
     inter = np.bitwise_and(x >= 8, x <= 10)
 
     a[inter] = -1.073 - 0.628 * (x[inter] - 8.) + 0.137 * (x[inter] - 8.)**2 - 0.070 * (x[inter] - 8.)**3
@@ -2227,3 +2227,12 @@ def calc_error_frac(a, b, sigma_a, sigma_b):
     else:
         sigma_ab = (a / b) * np.sqrt(((sigma_a) / a)**2 + ((sigma_b) / b)**2)
     return sigma_ab
+
+def calc_lpivot(l, T):
+
+    # http://www.astro.ljmu.ac.uk/~ikb/research/mags-fluxes/
+    # Transmission curves -> T
+
+    idx = np.where(l > 0.)[0]
+    return np.sqrt(simps(T[idx], l[idx]) / simps(T[idx] / l[idx]**2, l[idx]))
+
